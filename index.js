@@ -2,11 +2,24 @@ const mongoose = require('mongoose');
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const rateLimiter = require('express-rate-limit');
 
 const router = express.Router();
 const app = express();
 const routesDirectory = path.join(__dirname, 'routes');
 
+const allowlist = ['::ffff:127.0.0.1']
+
+const rateLimit = rateLimiter({
+  windowMs: 60 * 1000,
+  max: 10,
+  skipFailedRequests: true,
+  keyGenerator: (req, res) => req.ip,
+  skip: (req, res) => allowlist.includes(req.ip),
+  handler: (req, res, next, options) => { res.status(options.statusCode).send(options.message); console.warn(`${req.ip} is getting rate-limited!`) }
+})
+
+app.use(rateLimit)
 app.use(express.json())
 
 function print (path, layer) {
@@ -64,8 +77,9 @@ async function startServer() {
 
   loadRoutes(routesDirectory, '/');
 
-  app.listen(3000, () => {
-    console.log('Server is running on port 3000');
+  app.listen(process.env.port, () => {
+    console.log('Server is running on port ' + process.env.port);
+    console.log('http://localhost:' + process.env.port)
     app._router.stack.forEach(print.bind(null, []))
   });
 }

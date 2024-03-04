@@ -1,0 +1,19 @@
+{
+    "DEMC Express Router": {
+        "prefix": ["new", "router"],
+        "body": [
+            "const express = require('express');",
+            "const mongoose = require(process.env.mainFile);",
+            "const router = express.Router();",
+            "const Users = require(process.env.schemas);",
+            "const jwt = require('jsonwebtoken');",
+            "",
+            "router.get('/', (req, res) => {",
+            "    // Your route logic here",
+            "});",
+            "",
+            "module.exports = router;"
+        ],
+        "description": "New Express Route File"
+    }
+}
