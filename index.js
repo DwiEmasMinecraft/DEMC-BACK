@@ -3,9 +3,12 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const rateLimiter = require('express-rate-limit');
+const cors = require('cors');
+const sqlite3 = require('sqlite3').verbose();
 
 const router = express.Router();
 const app = express();
+app.use(cors())
 const routesDirectory = path.join(__dirname, 'routes');
 
 const allowlist = ['::ffff:127.0.0.1']
@@ -22,7 +25,20 @@ const rateLimit = rateLimiter({
 app.use(rateLimit)
 app.use(express.json())
 
-function print (path, layer) {
+let db = new sqlite3.Database('./tokens.db', (err) => {
+  if (err) {
+    console.error(err.message);
+  }
+  console.log('Connected to the tokens database.');
+});
+
+db.run(`CREATE TABLE IF NOT EXISTS tokens(token TEXT, ip TEXT)`, (err) => {
+  if (err) {
+    console.error(err.message);
+  }
+});
+
+function print(path, layer) {
   if (layer.route) {
     layer.route.stack.forEach(print.bind(null, path.concat(split(layer.route.path))))
   } else if (layer.name === 'router' && layer.handle.stack) {
@@ -34,7 +50,7 @@ function print (path, layer) {
   }
 }
 
-function split (thing) {
+function split(thing) {
   if (typeof thing === 'string') {
     return thing.split('/')
   } else if (thing.fast_slash) {
@@ -61,7 +77,7 @@ async function startServer() {
 
       if (fs.lstatSync(fullPath).isDirectory()) {
         if (!fullPath.includes('/cdn')) {
-            loadRoutes(fullPath, routePath);
+          loadRoutes(fullPath, routePath);
         }
       } else {
         const route = require(fullPath);
@@ -71,7 +87,7 @@ async function startServer() {
         app.use(routePath, route);
       }
     });
-  }  
+  }
 
   app.use('/cdn', express.static(path.join(routesDirectory, 'cdn')));
 
@@ -86,4 +102,4 @@ async function startServer() {
 
 startServer();
 
-module.exports = mongoose;
+module.exports = { mongoose, db };

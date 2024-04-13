@@ -1,5 +1,5 @@
 const express = require('express');
-const mongoose = require(process.env.mainFile);
+const mongoose = require(process.env.mainFile).mongoose;
 const router = express.Router();
 
 router.get('/', (req, res) => {

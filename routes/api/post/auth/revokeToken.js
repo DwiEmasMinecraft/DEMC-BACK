@@ -1,11 +1,11 @@
 const express = require('express');
-const mongoose = require(process.env.mainFile);
+const mongoose = require(process.env.mainFile).mongoose;
 const router = express.Router();
 const Users = require(process.env.schemas);
 const jwt = require('jsonwebtoken');
 
-router.get('/:id', (req, res) => {
-    res.send(jwt.sign({ userId: req.params.id }, process.env.key, { expiresIn: '1h'}))
+router.post('/', (req, res) => {
+    // Your route logic here
 });
 
 module.exports = router;
