@@ -30,4 +30,4 @@ jobs:
 
       - name: Deploy to server
         run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@ec2-13-215-179-5.ap-southeast-1.compute.amazonaws.com "cd /home/ubuntu/DEMC-BACK && git pull && ~/.bun/bin/bun install && pm2 start --interpreter ~/.bun/bin/bun index.js"
+          ssh -i ~/.ssh/id_rsa ubuntu@ec2-13-215-179-5.ap-southeast-1.compute.amazonaws.com "cd /home/ubuntu/DEMC-BACK && git pull && ~/.bun/bin/bun install && /home/ubuntu/.bun/bin/pm2 start --interpreter ~/.bun/bin/bun index.js"
