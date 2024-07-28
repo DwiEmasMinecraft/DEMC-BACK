@@ -3,7 +3,7 @@ name: Deploy with Bun and PM2
 on:
   push:
     branches:
-      - master  # or your branch name
+      - main  # or your branch name
 
 jobs:
   deploy:
@@ -12,14 +12,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Install Bun
-        run: |
-          curl -fsSL https://bun.sh/install | bash
-          export PATH="$HOME/.bun/bin:$PATH"
-
-      - name: Install PM2
-        run: npm install -g pm2
 
       - name: Setup SSH Key
         run: |
@@ -30,4 +22,10 @@ jobs:
 
       - name: Deploy to server
         run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@ec2-13-215-179-5.ap-southeast-1.compute.amazonaws.com "cd /home/ubuntu/DEMC-BACK && git pull && ~/.bun/bin/bun install && /home/ubuntu/.bun/bin/pm2 start --interpreter ~/.bun/bin/bun index.js"
+          ssh -i ~/.ssh/id_rsa ubuntu@ec2-13-215-179-5.ap-southeast-1.compute.amazonaws.com << 'EOF'
+            export PATH=$PATH:/home/ubuntu/.bun/bin:/home/ubuntu/.nvm/versions/node/$(node -v)/bin
+            cd /home/ubuntu/DEMC-BACK
+            git pull
+            ~/.bun/bin/bun install
+            /home/ubuntu/.bun/bin/pm2 start --interpreter ~/.bun/bin/bun index.js
+          EOF
