@@ -3,7 +3,7 @@ name: Deploy with Bun and PM2
 on:
   push:
     branches:
-      - main  # or your branch name
+      - master  # or your branch name
 
 jobs:
   deploy:
